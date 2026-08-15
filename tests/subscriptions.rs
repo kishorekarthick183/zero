@@ -31,3 +31,16 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
         assert_eq!(400, response.status().as_u16());
     }
 }
+
+#[tokio::test]
+async fn subscribe_returns_a_400_when_email_is_invalid() {
+    let app_address = helpers::spawn_app();
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{}/subscriptions", app_address))
+        .form(&[("name", "John Doe"), ("email", "not-an-email")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+    assert_eq!(400, response.status().as_u16());
+}
