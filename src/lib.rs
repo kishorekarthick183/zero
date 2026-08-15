@@ -17,6 +17,10 @@ struct Subscriber {
     email: String,
 }
 
+pub struct AppState {
+    // We'll add the database connection here later.
+}
+
 async fn health_check() -> HttpResponse {
     HttpResponse::Ok().finish()
 }

@@ -11,6 +11,8 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .await
         .expect("failed to execute request");
     assert_eq!(200, response.status().as_u16());
+    let response_body = response.text().await.expect("Failed to read response body");
+    assert!(response_body.is_empty());
 }
 
 #[tokio::test]
