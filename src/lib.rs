@@ -11,6 +11,12 @@ struct FormData {
     email: String,
 }
 
+#[derive(Debug)]
+struct Subscriber {
+    name: String,
+    email: String,
+}
+
 async fn health_check() -> HttpResponse {
     HttpResponse::Ok().finish()
 }
@@ -19,7 +25,11 @@ async fn subscribe(form: web::Form<FormData>) -> HttpResponse {
     if form.validate().is_err() {
         return HttpResponse::BadRequest().finish();
     }
-    println!("New subscriber: {} <{}>", form.name, form.email);
+    let subscriber = Subscriber {
+        name: form.name.clone(),
+        email: form.email.clone(),
+    };
+    println!("New subscriber: {:?}", subscriber);
     HttpResponse::Ok().finish()
 }
 
