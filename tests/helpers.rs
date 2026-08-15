@@ -7,11 +7,15 @@ pub struct TestApp {
 }
 
 pub async fn spawn_app() -> TestApp {
-    let configuration = zero2prod::configuration::get_configuration()
-    .expect("Failed to read configuration");
+    let configuration =
+        zero2prod::configuration::get_configuration().expect("Failed to read configuration");
     let db_pool = PgPool::connect(&configuration.test_database.connection_string())
         .await
         .expect("failed to connect to Postgres");
+    sqlx::query("TRUNCATE TABLE subscriptions")
+        .execute(&db_pool)
+        .await
+        .expect("Failed to clean subscriptions table");
     let listener = TcpListener::bind("127.0.0.1:0").expect("failed to bind random port");
     let port = listener
         .local_addr()
