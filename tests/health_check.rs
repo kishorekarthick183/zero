@@ -1,16 +1,5 @@
-use std::net::TcpListener;
-use zero2prod::run;
-
-fn spawn_app() -> String {
-    let listener = TcpListener::bind("127.0.0.1:0").expect("failed to bind to a random port");
-    let port = listener
-        .local_addr()
-        .expect("failed to get local add")
-        .port();
-    let server = run(listener).expect("failed to bind address");
-    let _ = tokio::spawn(server);
-    format!("http://127.0.0.1:{}", port)
-}
+mod helpers;
+use helpers::spawn_app;
 
 #[actix_web::test]
 async fn health_check_works() {
