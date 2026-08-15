@@ -2,6 +2,7 @@ use actix_web::{App, HttpResponse, HttpServer, dev::Server, web};
 use serde::Deserialize;
 use std::net::TcpListener;
 use validator::Validate;
+pub mod configuration;
 
 #[derive(Deserialize, Validate)]
 struct FormData {
