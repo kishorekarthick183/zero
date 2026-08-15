@@ -9,6 +9,10 @@ pub struct Settings {
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let settings = Config::builder()
         .add_source(config::File::with_name("configuration"))
+        .add_source(
+            Environment::with_prefix("APP")
+                .separator("_"),
+        )
         .build()?;
     settings.try_deserialize()
 }
