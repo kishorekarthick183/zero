@@ -35,13 +35,28 @@ async fn subscribe(form: web::Form<FormData>, connection_pool: web::Data<PgPool>
         name: form.name.clone(),
         email: form.email.clone(),
     };
-    insert_subscriber(subscriber, &connection_pool).await;
-    HttpResponse::Ok().finish()
+    match insert_subscriber(subscriber, &connection_pool).await {
+        Ok(_) => HttpResponse::Ok().finish(),
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
 }
 
-async fn insert_subscriber(subscriber: Subscriber, connection_pool: &PgPool) {
-    println!("Saving subscriber: {:?}", subscriber);
-    // Database INSERT will come here.
+async fn insert_subscriber(
+    subscriber: Subscriber,
+    connection_pool: &PgPool,
+) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+        r#"
+        INSERT INTO subscriptions (email, name)
+        VALUES ($1, $2)
+        "#,
+        subscriber.email,
+        subscriber.name
+    )
+    .execute(connection_pool)
+    .await?;
+
+    Ok(())
 }
 
 pub fn run(listener: TcpListener, connection_pool: PgPool) -> std::io::Result<Server> {

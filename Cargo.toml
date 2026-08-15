@@ -13,5 +13,6 @@ config = "0.15"
 sqlx = { version = "0.8", default-features = false, features = [
     "runtime-tokio",
     "tls-rustls",
-    "postgres"
+    "postgres",
+    "macros",
 ] }
