@@ -1,4 +1,4 @@
-use config::Config;
+use config::{Config, ConfigError, Environment};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -6,13 +6,10 @@ pub struct Settings {
     pub application_port: u16,
 }
 
-pub fn get_configuration() -> Result<Settings, config::ConfigError> {
+pub fn get_configuration() -> Result<Settings, ConfigError> {
     let settings = Config::builder()
         .add_source(config::File::with_name("configuration"))
-        .add_source(
-            Environment::with_prefix("APP")
-                .separator("_"),
-        )
+        .add_source(Environment::with_prefix("APP").separator("__"))
         .build()?;
     settings.try_deserialize()
 }
