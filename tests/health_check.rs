@@ -2,7 +2,7 @@ mod helpers;
 
 #[actix_web::test]
 async fn health_check_works() {
-    let app = helpers::spawn_app();
+    let app = helpers::spawn_app().await;
     let response = reqwest::get(format!("{}/health_check", app.address))
         .await
         .expect("Failed to execute request");

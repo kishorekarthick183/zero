@@ -2,7 +2,7 @@ mod helpers;
 
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
-    let app = helpers::spawn_app();
+    let app = helpers::spawn_app().await;
     let client = reqwest::Client::new();
     let response = client
         .post(format!("{}/subscriptions", app.address))
@@ -17,7 +17,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 
 #[tokio::test]
 async fn subscribe_returns_a_400_when_data_is_missing() {
-    let app = helpers::spawn_app();
+    let app = helpers::spawn_app().await;
     let client = reqwest::Client::new();
     let test_cases = [
         [("name", ""), ("email", "john@example.com")],
@@ -36,7 +36,7 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
 
 #[tokio::test]
 async fn subscribe_returns_a_400_when_email_is_invalid() {
-    let app = helpers::spawn_app();
+    let app = helpers::spawn_app().await;
     let client = reqwest::Client::new();
     let response = client
         .post(format!("{}/subscriptions", app.address))

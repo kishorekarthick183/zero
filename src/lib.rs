@@ -3,6 +3,7 @@ use serde::Deserialize;
 use std::net::TcpListener;
 use validator::Validate;
 pub mod configuration;
+use sqlx::PgPool;
 
 #[derive(Deserialize, Validate)]
 struct FormData {
@@ -42,9 +43,10 @@ fn insert_subscriber(subscriber: Subscriber) {
     println!("Saving subscriber: {:?}", subscriber);
 }
 
-pub fn run(listener: TcpListener) -> std::io::Result<Server> {
-    let server = HttpServer::new(|| {
+pub fn run(listener: TcpListener, connection_pool: PgPool) -> std::io::Result<Server> {
+    let server = HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::new(connection_pool.clone()))
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
     })
