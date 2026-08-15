@@ -1,6 +1,10 @@
 use std::net::TcpListener;
 
-pub fn spawn_app() -> String {
+pub struct TestApp {
+    pub address: String,
+}
+
+pub fn spawn_app() -> TestApp {
     let listener = TcpListener::bind("127.0.0.1:0").expect("failed to bind random port");
     let port = listener
         .local_addr()
@@ -8,5 +12,7 @@ pub fn spawn_app() -> String {
         .port();
     let server = zero2prod::run(listener).expect("failed to bind address");
     let _ = tokio::spawn(server);
-    format!("http://127.0.0.1:{}", port)
+    TestApp {
+        address: format!("http://127.0.0.1:{}", port),
+    }
 }
