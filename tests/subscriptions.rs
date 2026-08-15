@@ -11,8 +11,21 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .await
         .expect("failed to execute request");
     assert_eq!(200, response.status().as_u16());
-    let response_body = response.text().await.expect("Failed to read response body");
-    assert!(response_body.is_empty());
+    let saved_subscriber = sqlx::query!(
+        r#"
+        SELECT email, name
+        FROM subscriptions
+        WHERE email = $1
+        "#,
+        "john@example.com"
+    )
+    .fetch_one(&app.db_pool)
+    .await
+    .expect("Failed to fetch saved subscriber");
+
+    // use `cargo sqlx prepare -- --all-targets` for local persistence
+    assert_eq!(saved_subscriber.email, "john@example.com");
+    assert_eq!(saved_subscriber.name, "John Doe");
 }
 
 #[tokio::test]

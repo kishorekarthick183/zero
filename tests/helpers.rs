@@ -3,10 +3,11 @@ use std::net::TcpListener;
 
 pub struct TestApp {
     pub address: String,
+    pub db_pool: PgPool,
 }
 
 pub async fn spawn_app() -> TestApp {
-    let connection_pool = PgPool::connect("postgres://postgres:postgres@127.0.0.1:5432/newsletter")
+    let db_pool = PgPool::connect("postgres://postgres:postgres@127.0.0.1:5432/newsletter")
         .await
         .expect("failed to connect to Postgres");
     let listener = TcpListener::bind("127.0.0.1:0").expect("failed to bind random port");
@@ -14,9 +15,10 @@ pub async fn spawn_app() -> TestApp {
         .local_addr()
         .expect("failed to get local address")
         .port();
-    let server = zero2prod::run(listener, connection_pool).expect("failed to bind address");
+    let server = zero2prod::run(listener, db_pool.clone()).expect("failed to bind address");
     let _ = tokio::spawn(server);
     TestApp {
         address: format!("http://127.0.0.1:{}", port),
+        db_pool,
     }
 }
