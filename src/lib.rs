@@ -27,7 +27,7 @@ async fn health_check() -> HttpResponse {
     HttpResponse::Ok().finish()
 }
 
-async fn subscribe(form: web::Form<FormData>) -> HttpResponse {
+async fn subscribe(form: web::Form<FormData>, connection_pool: web::Data<PgPool>) -> HttpResponse {
     if form.validate().is_err() {
         return HttpResponse::BadRequest().finish();
     }
@@ -35,12 +35,13 @@ async fn subscribe(form: web::Form<FormData>) -> HttpResponse {
         name: form.name.clone(),
         email: form.email.clone(),
     };
-    insert_subscriber(subscriber);
+    insert_subscriber(subscriber, &connection_pool).await;
     HttpResponse::Ok().finish()
 }
 
-fn insert_subscriber(subscriber: Subscriber) {
+async fn insert_subscriber(subscriber: Subscriber, connection_pool: &PgPool) {
     println!("Saving subscriber: {:?}", subscriber);
+    // Database INSERT will come here.
 }
 
 pub fn run(listener: TcpListener, connection_pool: PgPool) -> std::io::Result<Server> {
