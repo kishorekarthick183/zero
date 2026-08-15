@@ -29,8 +29,12 @@ async fn subscribe(form: web::Form<FormData>) -> HttpResponse {
         name: form.name.clone(),
         email: form.email.clone(),
     };
-    println!("New subscriber: {:?}", subscriber);
+    insert_subscriber(subscriber);
     HttpResponse::Ok().finish()
+}
+
+fn insert_subscriber(subscriber: Subscriber) {
+    println!("Saving subscriber: {:?}", subscriber);
 }
 
 pub fn run(listener: TcpListener) -> std::io::Result<Server> {
