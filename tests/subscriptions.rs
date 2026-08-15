@@ -12,3 +12,22 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .expect("failed to execute request");
     assert_eq!(200, response.status().as_u16());
 }
+
+#[tokio::test]
+async fn subscribe_returns_a_400_when_data_is_missing() {
+    let app_address = helpers::spawn_app();
+    let client = reqwest::Client::new();
+    let test_cases = [
+        [("name", ""), ("email", "john@example.com")],
+        [("name", "John Doe"), ("email", "")],
+    ];
+    for test_case in test_cases {
+        let response = client
+            .post(format!("{}/subscriptions", app_address))
+            .form(&test_case)
+            .send()
+            .await
+            .expect("Failed to execute request");
+        assert_eq!(400, response.status().as_u16());
+    }
+}

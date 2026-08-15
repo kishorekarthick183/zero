@@ -13,6 +13,9 @@ async fn health_check() -> HttpResponse {
 }
 
 async fn subscribe(form: web::Form<FormData>) -> HttpResponse {
+    if form.name.is_empty() || form.email.is_empty() {
+        return HttpResponse::BadRequest().finish();
+    }
     println!("New subscriber: {} <{}>", form.name, form.email);
     HttpResponse::Ok().finish()
 }
