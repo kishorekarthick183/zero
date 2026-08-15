@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub struct Settings {
     pub application_port: u16,
     pub database: DatabaseSettings,
+    pub test_database: DatabaseSettings,
 }
 
 #[derive(Deserialize)]

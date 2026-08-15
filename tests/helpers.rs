@@ -7,7 +7,9 @@ pub struct TestApp {
 }
 
 pub async fn spawn_app() -> TestApp {
-    let db_pool = PgPool::connect("postgres://postgres:postgres@127.0.0.1:5432/newsletter_test")
+    let configuration = zero2prod::configuration::get_configuration()
+    .expect("Failed to read configuration");
+    let db_pool = PgPool::connect(&configuration.test_database.connection_string())
         .await
         .expect("failed to connect to Postgres");
     let listener = TcpListener::bind("127.0.0.1:0").expect("failed to bind random port");
