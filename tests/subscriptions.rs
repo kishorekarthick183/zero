@@ -59,3 +59,26 @@ async fn subscribe_returns_a_400_when_email_is_invalid() {
         .expect("Failed to execute request");
     assert_eq!(400, response.status().as_u16());
 }
+
+#[tokio::test]
+async fn subscribe_returns_a_500_when_database_fails() {
+    let app = helpers::spawn_app().await;
+
+    // TODO: Work on isolating the drop to avoid effect on other tests
+    // cause it conflicts with the truncate
+    sqlx::query("DROP TABLE subscriptions")
+        .execute(&app.db_pool)
+        .await
+        .expect("Failed to drop subscriptions table");
+
+    let client = reqwest::Client::new();
+
+    let response = client
+        .post(format!("{}/subscriptions", app.address))
+        .form(&[("name", "John Doe"), ("email", "john@example.com")])
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(500, response.status().as_u16());
+}

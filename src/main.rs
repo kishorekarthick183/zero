@@ -10,7 +10,6 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("failed to connect to connection pool");
     let address = format!("127.0.0.1:{}", configuration.application_port);
-    // TODO: try with single underscore
     let listener = TcpListener::bind(address)?;
     run(listener, connection_pool)?.await
 }
