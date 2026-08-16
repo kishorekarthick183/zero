@@ -30,7 +30,11 @@ async fn health_check() -> HttpResponse {
 }
 
 async fn subscribe(form: web::Form<FormData>, connection_pool: web::Data<PgPool>) -> HttpResponse {
-    if form.validate().is_err() {
+    if let Err(e) = form.validate() {
+        tracing::warn!(
+            error = ?e,
+            "Invalid subscriber data"
+        );
         return HttpResponse::BadRequest().finish();
     }
     let subscriber = Subscriber {
