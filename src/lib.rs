@@ -4,6 +4,8 @@ use std::net::TcpListener;
 use validator::Validate;
 pub mod configuration;
 use sqlx::PgPool;
+pub mod telemetry;
+use tracing_actix_web::TracingLogger;
 
 #[derive(Deserialize, Validate)]
 struct FormData {
@@ -37,7 +39,13 @@ async fn subscribe(form: web::Form<FormData>, connection_pool: web::Data<PgPool>
     };
     match insert_subscriber(subscriber, &connection_pool).await {
         Ok(_) => HttpResponse::Ok().finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => {
+            tracing::error!(
+                error = ?e,
+                "Failed to insert subscriber"
+            );
+            HttpResponse::InternalServerError().finish()
+        }
     }
 }
 
@@ -62,6 +70,7 @@ async fn insert_subscriber(
 pub fn run(listener: TcpListener, connection_pool: PgPool) -> std::io::Result<Server> {
     let server = HttpServer::new(move || {
         App::new()
+            .wrap(TracingLogger::default())
             .app_data(web::Data::new(connection_pool.clone()))
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
