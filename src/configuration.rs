@@ -3,9 +3,15 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct Settings {
-    pub application_port: u16,
+    pub application: ApplicationSettings,
     pub database: DatabaseSettings,
     pub test_database: DatabaseSettings,
+}
+
+#[derive(Deserialize)]
+pub struct ApplicationSettings {
+    pub host: String,
+    pub port: u16,
 }
 
 #[derive(Deserialize)]
@@ -41,6 +47,7 @@ mod tests {
     #[test]
     fn configuration_can_be_loaded() {
         let configuration = get_configuration().expect("Failed to read configuration");
-        assert_eq!(configuration.application_port, 8000);
+        assert_eq!(configuration.application.port, 8000);
+        assert_eq!(configuration.application.host, "127.0.0.1");
     }
 }

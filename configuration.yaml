@@ -1,4 +1,9 @@
-application_port: 8000
+application:
+  host: 127.0.0.1
+  port: 8000
+# for production use 
+# APP__APPLICATION__HOST=0.0.0.0
+# APP__APPLICATION__PORT=8000
 
 database:
   host: 127.0.0.1
