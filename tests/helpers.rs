@@ -1,5 +1,17 @@
 use sqlx::PgPool;
 use std::net::TcpListener;
+use std::sync::Once;
+
+static TRACING: Once = Once::new();
+
+pub fn init_tracing() {
+    TRACING.call_once(|| {
+        let subscriber =
+            zero2prod::telemetry::get_subscriber("test".into(), "info".into(), std::io::sink);
+
+        zero2prod::telemetry::init_subscriber(subscriber);
+    });
+}
 
 pub struct TestApp {
     pub address: String,
@@ -7,6 +19,7 @@ pub struct TestApp {
 }
 
 pub async fn spawn_app() -> TestApp {
+    init_tracing();
     let configuration =
         zero2prod::configuration::get_configuration().expect("Failed to read configuration");
     let db_pool = PgPool::connect(&configuration.test_database.connection_string())
